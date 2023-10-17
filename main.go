@@ -44,17 +44,17 @@ func (t *BinaryTree) add(val int64) {
 
 	t.root.addNode(val)
 
-  if t.root.balanceFactor < -1 || t.root.balanceFactor > 1 {
-    t.rebalance()
-  }
+	if t.root.balanceFactor < -1 || t.root.balanceFactor > 1 {
+		t.rebalance()
+	}
 }
 
 func (t *BinaryTree) rebalance() {
-  if t == nil || t.root == nil {
-    return
-  }
+	if t == nil || t.root == nil {
+		return
+	}
 
-  t.root = t.root.rebalance()
+	t.root = t.root.rebalance()
 }
 
 func (node *Node) addNode(val int64) int64 {
@@ -83,9 +83,9 @@ func (node *Node) addNode(val int64) int64 {
 		node.balanceFactor = right_height - new_left_height
 		// fmt.Printf("Node height: %d\n", node.height)
 
-    // if node.balanceFactor < -1 || node.balanceFactor > 1 {
-    //   node.rebalance()
-    // }
+		// if node.balanceFactor < -1 || node.balanceFactor > 1 {
+		//   node.rebalance()
+		// }
 
 		return node.height
 	} else {
@@ -109,9 +109,9 @@ func (node *Node) addNode(val int64) int64 {
 		node.height = findHeight(node)
 		// fmt.Printf("Node height: %d\n", node.height)
 
-    // if node.balanceFactor < -1 || node.balanceFactor > 1 {
-    //   node.rebalance()
-    // }
+		// if node.balanceFactor < -1 || node.balanceFactor > 1 {
+		//   node.rebalance()
+		// }
 
 		return node.height
 	}
@@ -309,21 +309,21 @@ func printRecursive(node *Node, height int64) {
 // }
 
 func (t *BinaryTree) inorder() {
-  if t == nil || t.root == nil {
-    return
-  }
+	if t == nil || t.root == nil {
+		return
+	}
 
-  inorderRecursive(t.root)
+	inorderRecursive(t.root)
 }
 
 func inorderRecursive(n *Node) {
-  if n == nil {
-    return
-  }
+	if n == nil {
+		return
+	}
 
-  inorderRecursive(n.left)
-  fmt.Printf("%d ", n.val)
-  inorderRecursive(n.right)
+	inorderRecursive(n.left)
+	fmt.Printf("%d ", n.val)
+	inorderRecursive(n.right)
 }
 
 func main() {
@@ -343,8 +343,7 @@ func main() {
 	t.add(14)
 	t.print()
 
-
-  t.inorder()
+	t.inorder()
 	// fmt.Printf("%+v\n", t.find(6))
 	//
 	// t.remove(6)
