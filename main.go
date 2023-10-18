@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 type Node struct {
@@ -74,18 +75,9 @@ func (node *Node) addNode(val int64) int64 {
 		new_left_height := node.left.addNode(val)
 		right_height := findHeight(node.right)
 
-		// fmt.Printf("Left height: %d\n", new_left_height)
-		// fmt.Printf("Right height: %d\n", right_height)
-
-		// node.height = max(new_left_height, right_height)
 		node.height = findHeight(node)
 
 		node.balanceFactor = right_height - new_left_height
-		// fmt.Printf("Node height: %d\n", node.height)
-
-		// if node.balanceFactor < -1 || node.balanceFactor > 1 {
-		//   node.rebalance()
-		// }
 
 		return node.height
 	} else {
@@ -100,18 +92,8 @@ func (node *Node) addNode(val int64) int64 {
 		new_right_height := node.right.addNode(val)
 		left_height := findHeight(node.left)
 
-		// fmt.Printf("Left height: %d\n", left_height)
-		// fmt.Printf("Right height: %d\n", new_right_height)
-
-		// node.balanceFactor = int32(math.Abs(float64(int32(new_right_height) - int32(left_height))))
 		node.balanceFactor = (new_right_height - left_height)
-		// node.height = max(left_height, new_right_height)
 		node.height = findHeight(node)
-		// fmt.Printf("Node height: %d\n", node.height)
-
-		// if node.balanceFactor < -1 || node.balanceFactor > 1 {
-		//   node.rebalance()
-		// }
 
 		return node.height
 	}
@@ -124,10 +106,6 @@ func findHeight(node *Node) int64 {
 
 	lh := findHeight(node.left)
 	rh := findHeight(node.right)
-
-	// if node.val == 7 {
-	//   fmt.Printf("lh: %d, rh: %d\n", lh, rh)
-	// }
 
 	m := 1 + max(lh, rh)
 
@@ -297,17 +275,6 @@ func printRecursive(node *Node, height int64) {
 	printRecursive(node.right, height)
 }
 
-// func (t *BinaryTree) prettyPrint() {
-//   if t.root == nil {
-//     return
-//   }
-//
-// }
-//
-// func ppRecursive(n *Node, height int) {
-//
-// }
-
 func (t *BinaryTree) inorder() {
 	if t == nil || t.root == nil {
 		return
@@ -330,24 +297,11 @@ func main() {
 	fmt.Println("Hello, World!")
 
 	t := newBinaryTree()
-	t.add(10)
-	t.print()
-	t.add(8)
-	t.print()
-	t.add(7)
-	t.print()
-	t.add(6)
-	t.print()
-	t.add(12)
-	t.print()
-	t.add(14)
-	t.print()
+	for i := 0; i < 100; i++ {
+		num := rand.Intn(100)
+		t.add(int64(num))
+	}
 
+	t.print()
 	t.inorder()
-	// fmt.Printf("%+v\n", t.find(6))
-	//
-	// t.remove(6)
-	// t.remove(14)
-	//
-	// t.print()
 }
