@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	// "math/rand"
 )
 
+// //////////////////////////////////////////////////////////////////////////////
+// Node
+// //////////////////////////////////////////////////////////////////////////////
 type Node struct {
 	left          *Node
 	right         *Node
@@ -23,94 +26,90 @@ func newNode() *Node {
 	}
 }
 
-type BinaryTree struct {
-	root *Node
-}
-
-func newBinaryTree() *BinaryTree {
-	return &BinaryTree{}
-}
-
-func (t *BinaryTree) add(val int64) {
-	if t.root == nil {
-		node := Node{
-			left:  nil,
-			right: nil,
-			val:   val,
-		}
-
-		t.root = &node
-		return
-	}
-
-	t.root.addNode(val)
-
-	if t.root.balanceFactor < -1 || t.root.balanceFactor > 1 {
-		t.rebalance()
-	}
-}
-
-func (t *BinaryTree) rebalance() {
-	if t == nil || t.root == nil {
-		return
-	}
-
-	t.root = t.root.rebalance()
-}
-
-func (node *Node) addNode(val int64) int64 {
+func (node *Node) insert(val int64) *Node {
 	if node == nil {
-		return 0
+		return &Node{
+			val:           val,
+			left:          nil,
+			right:         nil,
+			balanceFactor: 0,
+			height:        1,
+		}
 	}
 
-	if val <= node.val {
-		if node.left == nil {
-			newNode := newNode()
-			newNode.val = val
-			node.left = newNode
+	if node.val == val {
+		return node
+	}
 
-			return 1
-		}
-
-		new_left_height := node.left.addNode(val)
-		right_height := findHeight(node.right)
-
-		node.height = findHeight(node)
-
-		node.balanceFactor = right_height - new_left_height
-
-		return node.height
+	if node.val > val {
+		node.left = node.left.insert(val)
 	} else {
-
-		if node.right == nil {
-			newNode := newNode()
-			newNode.val = val
-			node.right = newNode
-			return 1
-		}
-
-		new_right_height := node.right.addNode(val)
-		left_height := findHeight(node.left)
-
-		node.balanceFactor = (new_right_height - left_height)
-		node.height = findHeight(node)
-
-		return node.height
-	}
-}
-
-func findHeight(node *Node) int64 {
-	if node == nil || node.left == nil && node.right == nil {
-		return 0
+		node.right = node.right.insert(val)
 	}
 
-	lh := findHeight(node.left)
-	rh := findHeight(node.right)
+  fmt.Println("Testing height difference")
+  fmt.Printf("%+v\n", node)
+  fmt.Printf("%+v\n", node.right)
+  fmt.Printf("Left Height fh: %d\n", findHeight(node.left))
+  fmt.Printf("Left Height gh: %d\n", node.left.getHeight())
+  fmt.Printf("Right Height fh: %d\n", findHeight(node.right))
+  fmt.Printf("Right Height gh: %d\n", node.right.getHeight())
+	node.height = 1 + max(findHeight(node.left), findHeight(node.right))
+	// node.height = 1 + max(node.left.getHeight(), node.right.getHeight())
 
-	m := 1 + max(lh, rh)
-
-	return m
+	fmt.Printf("Node balance factor: %d\n", node.bf())
+	return node.rebalance()
 }
+
+func (node *Node) bf() int64 {
+	return node.right.getHeight() - node.left.getHeight()
+}
+
+// Deprecated
+// func (node *Node) addNode(val int64) int64 {
+// 	if node == nil {
+// 		return 0
+// 	}
+//
+// 	if val == node.val {
+// 		return 0
+// 	}
+//
+// 	if val <= node.val {
+// 		if node.left == nil {
+// 			newNode := newNode()
+// 			newNode.val = val
+// 			node.left = newNode
+//
+// 			return 1
+// 		}
+//
+// 		new_left_height := node.left.addNode(val)
+// 		right_height := findHeight(node.right)
+//
+// 		node.height = findHeight(node)
+//
+// 		node.balanceFactor = right_height - new_left_height
+//
+// 		return node.height
+// 	} else {
+//
+// 		if node.right == nil {
+// 			newNode := newNode()
+// 			newNode.val = val
+// 			node.right = newNode
+// 			return 1
+// 		}
+//
+// 		new_right_height := node.right.addNode(val)
+// 		left_height := findHeight(node.left)
+//
+// 		node.balanceFactor = (new_right_height - left_height)
+// 		node.height = findHeight(node)
+//
+// 		return node.height
+// 	}
+// }
 
 func (n *Node) getHeight() int64 {
 	if n == nil {
@@ -118,6 +117,23 @@ func (n *Node) getHeight() int64 {
 	}
 
 	return n.height
+}
+
+func findHeight(node *Node) int64 {
+	if node == nil {
+		return 0
+	}
+
+  if node.left == nil && node.right == nil {
+    return 1
+  }
+
+	lh := findHeight(node.left)
+	rh := findHeight(node.right)
+
+	m := 1 + max(lh, rh)
+
+	return m
 }
 
 func (n *Node) rotateLeft() *Node {
@@ -165,38 +181,47 @@ func (n *Node) rotateLeftRight() *Node {
 }
 
 func (n *Node) rebalance() *Node {
-	fmt.Printf("rebalance %d\n", n.val)
-	// n.Dump(0, "")
+	fmt.Printf("rebalance %d: %d\n", n.val, n.balanceFactor)
 	switch {
-	case n.balanceFactor < -1 && n.left.balanceFactor == -1:
+	case n.bf() < -1 && n.left.bf() == -1:
 		return n.rotateRight()
-	case n.balanceFactor > 1 && n.right.balanceFactor == 1:
+	case n.bf() > 1 && n.right.bf() == 1:
 		return n.rotateLeft()
-	case n.balanceFactor < -1 && n.left.balanceFactor == 1:
+	case n.bf() < -1 && n.left.bf() == 1:
 		return n.rotateLeftRight()
-	case n.balanceFactor > 1 && n.right.balanceFactor == -1:
+	case n.bf() > 1 && n.right.bf() == -1:
 		return n.rotateRightLeft()
 	}
 	return n
 }
 
-func balanceTree(node *Node) {
+// //////////////////////////////////////////////////////////////////////////////
+// Tree
+// //////////////////////////////////////////////////////////////////////////////
+type BinaryTree struct {
+	root *Node
 }
 
-func max(a int64, b int64) int64 {
-	if a > b {
-		return a
-	} else {
-		return b
+func newBinaryTree() *BinaryTree {
+	return &BinaryTree{}
+}
+
+func (t *BinaryTree) insert(val int64) {
+	t.root = t.root.insert(val)
+
+	fmt.Printf("Root balanceFactor: %d\n", t.root.balanceFactor)
+	if t.root.balanceFactor < -1 || t.root.balanceFactor > 1 {
+		fmt.Println("Going to rebalance")
+		t.rebalance()
 	}
 }
 
-func min(a int64, b int64) int64 {
-	if a < b {
-		return a
-	} else {
-		return b
+func (t *BinaryTree) rebalance() {
+	if t == nil || t.root == nil {
+		return
 	}
+
+	t.root = t.root.rebalance()
 }
 
 func (t *BinaryTree) find(val int64) *Node {
@@ -293,15 +318,41 @@ func inorderRecursive(n *Node) {
 	inorderRecursive(n.right)
 }
 
+// //////////////////////////////////////////////////////////////////////////////
+// Utils
+// //////////////////////////////////////////////////////////////////////////////
+func max(a int64, b int64) int64 {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func min(a int64, b int64) int64 {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
 func main() {
 	fmt.Println("Hello, World!")
 
 	t := newBinaryTree()
-	for i := 0; i < 100; i++ {
-		num := rand.Intn(100)
-		t.add(int64(num))
+
+	for i := 1; i <= 100; i++ {
+		t.insert(int64(i))
 	}
+
+	// t.insert(1)
+	// t.insert(2)
+	// t.insert(3)
 
 	t.print()
 	t.inorder()
+
+	// fmt.Println("")
+	// fmt.Printf("%d\n", findHeight(t.root))
 }
